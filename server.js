@@ -6,15 +6,15 @@ var express     = require('express');
     auth        = require('./services/middleware_private_user'),
     request     = require("request");
 
-var server      = express();
+var app      = express();
     firebase    = config.firebase;
     router      = express.Router();
-    server.use(bodyParser.urlencoded({ extended: false }))
-    server.use(bodyParser.json())
-    server.use(cors())
-    server.use('/', require('./routes'));
-    server.use('/', express.static(__dirname+'/public/'));
+    app.use(bodyParser.urlencoded({ extended: false }))
+    app.use(bodyParser.json())
+    app.use(cors())
+    app.use('/', require('./routes'));
+    app.use('/', express.static(__dirname+'/public/'));
 
-server.listen(config.server.port, config.server.ip, function(){
-    console.log('Servidor corriendo en ' + config.server.ip + ':' + config.server.port );
+app.listen(config.app.port, config.app.ip, function(){
+    console.log('Servidor corriendo en ' + config.app.ip + ':' + config.app.port );
 });
