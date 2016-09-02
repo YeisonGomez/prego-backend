@@ -4,28 +4,33 @@ module.exports.loginChaira = function(params, user, password, callback) {
         client
             .init()
             .url('https://chaira.udla.edu.co/Chaira/Logon.aspx')
-            .windowHandleSize({width: 1000, height: 760})
+            .windowHandleSize({ width: 1000, height: 760 })
             .setValue('#txt_usuario', user)
             .addValue('#txt_password', password)
             .click("#btn_ingresar").then(function() {
                 console.log("Login....");
                 validLogin(function(res) {
                     console.log(res);
-                    clickSubMenu2("Inicio", "button", function(res1) {
-                        if (res1 == "Bien") {
-                            client.isExisting('//span[text()="' + 'Docentes' + '"]').then(function(ex) {
-                                var rol;
-                                if (ex == true) {
-                                    rol = "Docente";
-                                } else {
-                                    rol = "Estudiante";
-                                }
-                                callback(res, client, program, rol);
-                            });
-                        } else {
-                            callback(res1);
-                        }
-                    });
+                    if (res == "user valid") {
+                        clickSubMenu2("Inicio", "button", function(res1) {
+                            if (res1 == "Bien") {
+                                client.isExisting('//span[text()="' + 'Docentes' + '"]').then(function(ex) {
+                                    var rol;
+                                    if (ex == true) {
+                                        rol = "Docente";
+                                    } else {
+                                        rol = "Estudiante";
+                                    }
+                                    callback(res, client, program, rol);
+                                });
+                            } else {
+                                callback(res1, client, program);
+                            }
+                        });
+                    } else {
+                        callback(res, client, program);
+                    }
+
                 });
             });
 

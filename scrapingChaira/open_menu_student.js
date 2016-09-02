@@ -60,7 +60,8 @@ module.exports.openMenu = function(client, menu, callback) {
                         copyE = menu;
                         callback("Bien");
                     }).catch(function(err) {
-                        //console.log(err.message);
+                        console.log(err.message);
+                        callback("Lo sentimos hubo un error en el servidor");
                     })
                 });
             }).catch(function(err) {

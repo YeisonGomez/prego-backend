@@ -10,5 +10,5 @@ exports.generateToken = function(token){
         date: token.date
       }
 
-  return jwt.encode(payload, 'pregokey123');
+  return {token: jwt.encode(payload, 'pregokey123')};
 };

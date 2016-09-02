@@ -2,22 +2,81 @@ var db = firebase.database();
 var group = db.ref("group");
 var userDB = db.ref("user");
 
+exports.saveGroupTeacher = function(dataList, dataTeacher) {
+    //id, name, group
+    var teacher = dataTeacher;
+    for (var i = 0; i < dataList.length; i++) {
+        var subject = dataList[i];
+        controlGroupTeacher(subject, teacher);
+
+    }
+}
+
+var controlGroupTeacher = function(subject, teacher) {
+
+    var codeGroup = generateCodeGroup(generatePreiod(), {
+        group: subject.group,
+        name: subject.name
+    });
+
+    group.orderByKey().equalTo(codeGroup).once("value", function(snapshot) {
+
+
+        if (snapshot.val() != null) {
+            db.ref("group/" + codeGroup + "/member").child(teacher.id).update({
+                name: teacher.name,
+                rol: "Docente"
+            });
+
+            db.ref("user/" + teacher.id + "/group").child(codeGroup).update({
+                name: subject.name
+            });
+            
+        } else {
+            group.child(codeGroup).set({
+                codeSubject: subject.id,
+                nameSubject: subject.name.toUpperCase(),
+                period: generatePreiod(),
+                group: subject.group,
+                teacher_id: teacher.id,
+                resource: "",
+                member: []
+            });
+
+            db.ref("user/" + teacher.id + "/group").child(codeGroup).update({
+                name: subject.name
+            });
+
+            db.ref("group/" + codeGroup + "/member").child(teacher.id).set({
+                name: teacher.name,
+                rol: "Docente"
+            });
+        }
+    });
+}
+
+var generatePreiod = function() {
+    var age = new Date().getFullYear();
+    if (new Date().getMonth() >= 6) {
+        return age + " - 2";
+    } else {
+        return age + " - 1";
+    }
+}
+
 exports.isGroup = function(user) {
     for (var i = 0; i < user.schedule.length; i++) {
-        controlGroup(user, user.schedule[i], generateCodeGroup(user.period, user.program, user.schedule[i]));
-        //Docente
-        //Si el docente ya se ha logeado no hace nada.
-        //Si ya existe la materia, se agrega
-        //Si no existe el grupo: Crea el grupo, se agrega
+        controlGroup(user, user.schedule[i], generateCodeGroup(user.period, user.schedule[i]));
     }
 
     //Agregar Docentes en usuario
     for (var i = 0; i < user.listTeachers.length; i++) {
         userDB.child(user.listTeachers[i].id).set({
             user: "",
-            name: user.listTeachers[i].name,
+            name: user.listTeachers[i].name.toUpperCase(),
             program: "",
             session: "",
+            rol: "Docente"
         });
     }
 }
@@ -38,27 +97,31 @@ var controlGroup = function(user, schedule, codeGroup) {
                     name: schedule.name
                 });
 
-                //Agregar al docente como miembro
-                db.ref("group/" + codeGroup + "/member").child(idTeacher.id).update({
-                    name: idTeacher.name,
-                    rol: "Docente"
-                });
+                if (idTeacher.id != "SD") {
+                    //Agregar al docente como miembro
+                    db.ref("group/" + codeGroup + "/member").child(idTeacher.id).update({
+                        name: idTeacher.name.toUpperCase(),
+                        rol: "Docente"
+                    });
 
-                //Agregar ids grupos Docente
-                db.ref("user/" + idTeacher.id + "/group").child(codeGroup).update({
-                    name: schedule.name,
-                });
+                    //Agregar ids grupos Docente
+                    db.ref("user/" + idTeacher.id + "/group").child(codeGroup).update({
+                        name: schedule.name.toUpperCase(),
+                    });
+                }
             } else {
                 //Crear un nuevo grupo
-                group.child(codeGroup).set({
-                    codeSubject: schedule.id,
-                    nameSubject: schedule.name,
-                    period: user.period,
-                    group: schedule.group,
-                    teacher_id: idTeacher.id,
-                    resource: schedule.resource,
-                    member: ""
-                });
+                group.child(codeGroup)
+                    .set({
+                        codeSubject: schedule.id,
+                        nameSubject: schedule.name.toUpperCase(),
+                        period: user.period,
+                        group: schedule.group,
+                        teacher_id: idTeacher.id,
+                        resource: schedule.resource,
+                        member: ""
+                    });
+
                 //Se agrega como miembro
                 db.ref("group/" + codeGroup + "/member").child(user.codeStudent).set({
                     name: user.nameStudent,
@@ -66,37 +129,39 @@ var controlGroup = function(user, schedule, codeGroup) {
                 });
                 //Agregar grupos Estudiante
                 db.ref("user/" + user.codeStudent + "/group").child(codeGroup).update({
-                    name: schedule.name
+                    name: schedule.name.toUpperCase()
                 });
 
-                //Agregar docente
-                db.ref("group/" + codeGroup + "/member").child(idTeacher.id).set({
-                    name: idTeacher.name,
-                    rol: "Docente"
-                });
+                if (idTeacher.id != "SD") {
+                    //Agregar docente
+                    db.ref("group/" + codeGroup + "/member").child(idTeacher.id).set({
+                        name: idTeacher.name,
+                        rol: "Docente"
+                    });
 
-                //Agregar ids grupos Docente
-                db.ref("user/" + idTeacher.id + "/group").child(codeGroup).update({
-                    name: schedule.name
-                });
+                    //Agregar ids grupos Docente
+                    db.ref("user/" + idTeacher.id + "/group").child(codeGroup).update({
+                        name: schedule.name.toUpperCase()
+                    });
+                }
             }
         });
     });
 }
 
-var generateCodeGroup = function(periodo, program, schedule) {
+var generateCodeGroup = function(periodo, schedule) {
     var age = periodo.substring(0, 4);
     var period = periodo.substring(7, 8);
     var codeGrupo = 0;
-    for (var i = 0; i < schedule.group.length; i++) {
-        codeGrupo += parseInt(schedule.group.substring(i, i + 1).charCodeAt(0) + i);
+    for (var i = 0; i < schedule.group.length; i++) { //nombre del grupo
+        codeGrupo += parseInt(schedule.group.substring(i, i + 1).toUpperCase().charCodeAt(0) + i);
     }
 
     var codeNameSubject = 0;
-    for (var i = 0; i < schedule.name.length; i++) {
-        codeNameSubject += parseInt(schedule.name.substring(i, i + 1).charCodeAt(0) + i);
+    for (var i = 0; i < schedule.name.length; i++) { //Nombre de la materia
+        codeNameSubject += parseInt(schedule.name.substring(i, i + 1).toUpperCase().charCodeAt(0) + i);
     }
-    var code = age + period + codeNameSubject + codeGrupo + program.length;
+    var code = age + period + codeNameSubject + codeGrupo;
     return code;
 }
 
@@ -104,14 +169,17 @@ var getIdTeacher = function(listDocente, name, callback) {
     name = name.replaceAll(" ", "");
     if (name != "SD") {
         for (var i = 0; i < listDocente.length; i++) {
-            if (listDocente[i].name.replaceAll(" ", "") == name.toUpperCase()) {
+            if (listDocente[i].name.replaceAll(" ", "").toUpperCase() == name.toUpperCase()) {
                 callback(listDocente[i]);
+            } else if ((i + 1) == listDocente.length) {
+                callback({ id: "SD", name: name });
             }
         }
     } else {
-        callback("SD");
+        callback({ id: "SD", name: "SD" });
     }
 }
+
 
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;

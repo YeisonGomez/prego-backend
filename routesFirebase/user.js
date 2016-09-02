@@ -21,16 +21,23 @@ exports.saveStudent = function(student, token, user) {
         user: user,
         name: student.nameStudent,
         program: student.program,
-        session: token,
-        group: []
+        session: token.token,
+        group: [],
+        rol: "Estudiante"
     });
     return token;
 }
 
-exports.getAll = function() {
-    studentFB.on("value", function(snapshot) {
-        return snapshot.val();
-    }, function(errorObject) {
-        console.log("The read failed: " + errorObject.code);
+exports.saveDocent = function(teacher, token, user, groups){
+    var usersRef = studentFB.child(teacher.id);
+    usersRef.set({
+        user: user,
+        name: teacher.name,
+        program: "",
+        session: token.token,
+        group: [],
+        rol: "Docente"
     });
+    return token;
 }
+
