@@ -1,0 +1,128 @@
+<!--Copyright (c) <2016> <Yeison Gomez Rodriguez, Brayan Stiven Tovar Claros>-->
+<ion-side-menus enable-menu-with-back-views="true" class="indigo-300">
+    <ion-side-menu-content>
+        <ion-nav-bar class="bar-stable">
+            <ion-nav-back-button>
+            </ion-nav-back-button>
+            <ion-nav-buttons side="left">
+                <button class="color-white button button-icon button-clear ion-navicon" menu-toggle="left" ng-if="isWall()">
+                </button>
+            </ion-nav-buttons>
+            <ion-nav-buttons side="right">
+                <button class="color-white button button-icon button-clear ion-android-more-vertical" menu-toggle="right" ng-if="!isWall()">
+                </button>
+            </ion-nav-buttons>
+        </ion-nav-bar>
+        <ion-nav-view name="menuContent"></ion-nav-view>
+    </ion-side-menu-content>
+    <ion-side-menu side="left">
+        <ion-content>
+            <!-- Mini perfil usuario -->
+            <div>
+                <a class="item indigo-500">
+                    <!--<img src="/img/chola.jpg"> -->
+                    <p class="color-white">{{user.id}}</p>
+                    <h2 class="color-white text-no-trunc">{{user.name}}</h2>
+                    <p class="color-white">{{user.program}}</p>
+                </a>
+            </div>
+            <!-- ================ -->
+            <!-- MOdal Promedio-->
+            <ion-list>
+                <ion-item menu-close class="background-none color-icon-card item item-icon-left indigo-500-text" ui-sref="main.subjects"> <i class="icon ion-clipboard color-amber"></i>Materias</ion-item>
+
+
+                 <ion-item menu-close class="background-none item item-icon-left indigo-500-text" ng-click="openProm($event)"><i class="icon ion-stats-bars color-amber"></i>Promedio</ion-item>
+                <ion-item menu-close class="background-none item item-icon-left indigo-500-text"> <i class="icon ion-loop color-amber"></i>Actualizar materias</ion-item>
+                
+                <ion-item class="background-none item item-icon-left indigo-500-text" href="" ng-click="activelogOut(viewlogOut)" ng-if="!viewlogOut"> <i class="icon ion-log-out color-amber"></i><span>Cerrar sesión</span>
+                </ion-item>
+                <div class="item item-divider text-center style-log-out" ng-if="viewlogOut">
+                    ¿Estás seguro de irte?
+                </div>
+                <div class="button-bar style-log-out" ng-if="viewlogOut">
+                    <a class="border-none button button-outline button-balanced icon ion-checkmark-round" ng-click="logout()"></a>
+                    <a class="border-none button button-outline button-assertive icon ion-close-round" ng-click="activelogOut(viewlogOut)"></a>
+                </div>
+                <div class="divider"> </div>
+            </ion-list>
+            <img ng-click="openConfig($event)" src="img/LogoUA.svg" class="style-logo-ua">
+            <p class="cursive text-center style-text-ua width-all">Construimos nación desde nuestra
+                <br>estratégica región</p>
+        </ion-content>
+    </ion-side-menu>
+    <!--=================================MENU DERECHO================================-->
+    <ion-side-menu side="right" is-enabled="!isWall()" ,>
+        <ion-content>
+            <!-- Promedio General -->
+            <div class="border-promedio indigo-500">
+                <div class="circle-promedio indigo-500-text display-table">
+                    {{promedyAll()}}
+                </div>
+                <!-- Texto docente-->
+                <div class="color-white text-promedio display-table">Promedio
+                    <br>General</div>
+                <!-- texto Estudiante-->
+                <!--<div class="color-white text-promedio display-table">Promedio <br> actual</div>--></div>
+            <!-- ================ -->
+            <!--<div>
+                profesor, materia, horario
+            </div>-->
+            <ion-list>
+                <div class="item item-divider indigo-500-text">
+                    Actividades
+                </div>
+                <ion-item ng-if="grades.length < 1" class="item item-icon-left indigo-500-text">
+                    <i class="icon ion-android-clipboard"></i>
+                    <span>No hay actividades</span>
+                </ion-item>
+                <ion-item class="item item-icon-left indigo-500-text padding-text-badge" ng-repeat="activity in grades">
+                    <i class="icon ion-clipboard"></i>
+                    <span class="trunc-text">{{activity.nameActivity}}</span>
+                    <span ng-if="user.rol != 'Docente'" class="badge color-white" ng-class="{ 'prom-high': activity.grade>=4, 'prom-basic': activity.grade>=3&&activity.grade<4, 'prom-low': activity.grade<3 }">
+                        {{activity.grade}}
+                    </span>
+                </ion-item>
+            </ion-list>
+        </ion-content>
+    </ion-side-menu>
+</ion-side-menus>
+<!--=====================Modales======================-->
+<script id="modalPromedio" type="text/ng-template">
+    <ion-modal-view class="fix-modal modal-border-round">
+        <ion-header-bar>
+            <h1 class="title text-center">Promedio</h1>
+        </ion-header-bar>
+        <ion-content>
+            <ion-item class="item indigo-500-text padding-text-badge" ng-repeat="activity in activities">
+                <span class="trunc-text">{{activity.name}}</span>
+                <span class="badge color-white" ng-class="{ 'prom-high': activity.grade>=4, 'prom-basic': activity.grade>=3&&activity.grade<4, 'prom-low': activity.grade<3 }">
+                        {{activity.grade}}
+                    </span>
+            </ion-item>
+        </ion-content>
+    </ion-modal-view>
+</script>
+<!--modal config-->
+<script id="modalConfig" type="text/ng-template">
+    <ion-modal-view class="fix-modal modal-border-round">
+        <ion-header-bar>
+            <h1 class="title text-center">Acerca de</h1>
+        </ion-header-bar>
+        <ion-content>
+            <div class="list">
+            <img class="img-name" src="img/name.png">
+                <div class="text-center">Concurso departamental de aplicaciones móviles <br> “apps para la construcción de paz”</div>
+            <br>
+                <div class="item item-divider">
+                    Desarrollo 
+                </div>
+                <ion-item class="item">Yeison Gomez Rodriguez<br>Brayan Stiven Tovar Claros</ion-item>
+                <br>
+                <div class="item item-divider text-center">
+                    2016
+                </div>
+            </div>
+        </ion-content>
+    </ion-modal-view>
+</script>

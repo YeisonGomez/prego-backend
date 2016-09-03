@@ -1,0 +1,15 @@
+<!--Copyright (c) <2016> <Yeison Gomez Rodriguez, Brayan Stiven Tovar Claros>-->
+<ion-content scroll="true">
+    <div ng-repeat="chat in conversationStudent | orderBy: '-time'" class="chat-globo {{chat.class}} margin-5-pc width-90-pc">
+        {{chat.message}}
+        <div class="chat-hour">
+            {{chat.time | date: 'MMMM/dd h:mm a'}}
+        </div>
+    </div>
+</ion-content>
+<div class="bar bar-footer fix-border-footer footer-slide-down indigo-600" ng-if="loading">
+    <label class="item item-input indigo-50 border-none width-85-pc">
+        <input type="text" placeholder="Escribe tu mensaje">
+    </label>
+    <a class="button color-amber button-icon icon ion-paper-airplane pull-right"></a>
+</div>
