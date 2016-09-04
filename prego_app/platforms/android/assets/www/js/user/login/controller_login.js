@@ -1,12 +1,12 @@
 /*Copyright (c) <2016> <Yeison Gomez Rodriguez, Brayan Stiven Tovar Claros>*/
-app.controller('loginCtrl', function($scope, $auth, $state, $rootScope, $stateParams, $ionicHistory) {
+app.controller('loginCtrl', function($scope, $auth, $state, $rootScope, $stateParams, $ionicHistory, $ionicPopup) {
     $scope.user = {
         user: "",
         password: ""
     };
     var vari;
     var repit = false;
-    
+
     $scope.login = function() {
         if (!repit && $scope.validLogin()) {
             $rootScope.loading(90);
@@ -29,7 +29,7 @@ app.controller('loginCtrl', function($scope, $auth, $state, $rootScope, $statePa
                         rol: $auth.getPayload().rol
                     };
 
-                    $ionicHistory.clearCache().then(function(){
+                    $ionicHistory.clearCache().then(function() {
                         $state.go("main.subjects");
                     });
                     //Guardar credenciales en local
@@ -53,4 +53,40 @@ app.controller('loginCtrl', function($scope, $auth, $state, $rootScope, $statePa
     $scope.validLogin = function() {
         return ($scope.user.user.length > 3 && $scope.user.password.length > 2);
     }
+
+    //======================Modal=============================
+
+
+    $scope.modalPassword = function(user) {
+        var alertPopup = $ionicPopup.prompt({
+            title: 'Contraseña Prego',
+            subTitle: 'Si olvidas esta contraseña, restablecela iniciando con tu cuenta chairá nuevamente.',
+            cssClass: 'style-modal',
+            template: ' ',
+            inputType: 'text',
+            inputPlaceholder: 'Contaseña',
+            cancelText: 'Cancelar',
+            cancelType: 'button-outline color-amber',
+            okText: 'Continuar',
+            okType: 'button-royal'
+        })
+    }
+    
+    $scope.modalConfirm = function(user) {
+        var alertPopup = $ionicPopup.confirm({
+            title: 'Contraseña Prego',
+            subTitle: '',
+            cssClass: 'style-modal text-center',
+            template: 'Si olvidas esta contraseña, restablecela iniciando con tu cuenta chairá nuevamente.',
+            inputType: 'text',
+            inputPlaceholder: 'Contaseña',
+            cancelText: 'Cancelar',
+            cancelType: 'button-outline color-amber',
+            okText: 'Continuar',
+            okType: 'button-royal'
+        })
+    }
+
+
+
 });

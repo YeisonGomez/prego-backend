@@ -14,7 +14,7 @@ app.factory('studentService', function($http, $rootScope) {
             fireBD2.limitToLast(tam + 10).on('child_added', function(data) {
                 addMessage({
                     key: data.key,
-                    user_id: data.val().id,
+                    user_name: data.val().name,
                     message: data.val().message,
                     rol: data.val().rol,
                     time: data.val().time

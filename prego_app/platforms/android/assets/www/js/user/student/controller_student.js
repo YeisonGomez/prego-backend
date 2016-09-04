@@ -21,14 +21,14 @@ app.controller('studentCtrl', function($scope, $ionicPopup, studentService, $cor
     var setMessage = function(data) {
         if (getRepeat(data)) {
             contMostMessages = 10;
+            var rol = classRol(data);
             $rootScope.conversationStudent.push({
                 id: data.key,
-                user_id: data.user_id,
+                user_name: (rol == 'chat-mine')? "Yo:" : data.user_name,
                 message: data.message,
                 class: classRol(data),
                 time: data.time 
             });
-            console.log($rootScope.conversationStudent);
             saveMessage(data);
         } else {
             contMostMessages++;
@@ -63,11 +63,11 @@ app.controller('studentCtrl', function($scope, $ionicPopup, studentService, $cor
     var repit = false;
     $scope.sendMessageStudent = function(message) {
         if ($cordovaNetwork.isOnline()) {
-            if (!repit) {
+            if (!repit && validMessage(message)) {
                 $rootScope.loading(6);
                 repit = true;
                 studentService.sendMessage({
-                    id: $rootScope.user.id,
+                    name: $rootScope.user.name,
                     message: message,
                     rol: $rootScope.user.rol,
                     time: new Date().getTime()
@@ -93,7 +93,7 @@ app.controller('studentCtrl', function($scope, $ionicPopup, studentService, $cor
             $cordovaSQLite.execute(db, query, [$state.params.id]).then(function(result) {
                 if (result.rows.length >= 10) {
                     var query = "UPDATE chatstudent SET user = ?, message = ?, userol = ?, time = ? WHERE chat_id = ?";
-                    $cordovaSQLite.execute(db, query, [data.user_id, data.message, data.rol, data.time, data.key]).then(function(result2) {
+                    $cordovaSQLite.execute(db, query, [data.user_name, data.message, data.rol, data.time, data.key]).then(function(result2) {
                         //console.log("UPDATE -> " + data.message);
                     }, function(error) {
                         console.log(error);
@@ -110,7 +110,7 @@ app.controller('studentCtrl', function($scope, $ionicPopup, studentService, $cor
                     }
                     if (!exist) {
                         var query = "INSERT INTO chatstudent (group_id, chat_id, user, message, userol, time) VALUES (?, ?, ?, ?, ?, ?)";
-                        $cordovaSQLite.execute(db, query, [$state.params.id, data.key, data.user_id, data.message, data.rol, data.time]).then(function(result3) {
+                        $cordovaSQLite.execute(db, query, [$state.params.id, data.key, data.user_name, data.message, data.rol, data.time]).then(function(result3) {
                             //console.log("INSERT ID -> " + data.message);
                         }, function(error, a) {
                             console.log(error);
@@ -135,12 +135,12 @@ app.controller('studentCtrl', function($scope, $ionicPopup, studentService, $cor
             if (result.rows.length > 0) {
                 console.log("Datos locales");
                 for (var i = 0; i < result.rows.length; i++) {
-                    //console.log(result.rows.item(i));
+                    var rol = classRol({rol: result.rows.item(i).userol, user_name: result.rows.item(i).user});
                     $rootScope.conversationStudent.push({
                         id: result.rows.item(i).chat_id,
-                        user_id: result.rows.item(i).user,
+                        user_name: (rol == 'chat-mine')? "Yo:": result.rows.item(i).user,
                         message: result.rows.item(i).message,
-                        class: classRol(result.rows.item(i).userol),
+                        class: rol,
                         time: result.rows.item(i).time
                     });
                 }
@@ -154,7 +154,7 @@ app.controller('studentCtrl', function($scope, $ionicPopup, studentService, $cor
     }
 
     var classRol = function(send) {
-        if ($rootScope.user.id == send.user_id) {
+        if ($rootScope.user.name == send.user_name) {
             return "chat-mine";
         } else {
             return "chat-other";
@@ -162,4 +162,15 @@ app.controller('studentCtrl', function($scope, $ionicPopup, studentService, $cor
     }
 
     $scope.getMessagess();
+
+    var validMessage = function(message) {
+        if(message != undefined){
+            for (var i = 0; i < message.length; i++) {
+                if (message.substring(i, i + 1) != " " && message.substring(i, i + 1) != "") {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 });

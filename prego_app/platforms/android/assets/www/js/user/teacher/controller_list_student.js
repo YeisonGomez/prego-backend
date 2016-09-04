@@ -241,7 +241,7 @@ app.controller('listStudentCtrl', function($scope, $rootScope, $ionicPopup, $sta
             console.error(error);
         });
     }
-
+    
     var downloadMemebers = function(fireDB, i, callback) {
         if (i + 1 <= $rootScope.subjects.length) {
             fireDB.ref('group/' + $rootScope.subjects[i].id + '/member').once('value', function(snapshot) {
@@ -259,6 +259,8 @@ app.controller('listStudentCtrl', function($scope, $rootScope, $ionicPopup, $sta
                         });
                         //console.log("Guardando.." + $rootScope.formatName(data.val().name) + " en " + $rootScope.subjects[i].name);
                         $scope.insertGroupStudent($rootScope.subjects[i].id, data.key, $rootScope.formatName(data.val().name), data.val().rol);
+                    } else {
+                        $rootScope.teachers.push({ subject: $rootScope.subjects[i].id, name: $rootScope.formatName(data.val().name) });
                     }
                 });
                 downloadMemebers(fireDB, i + 1, callback);
@@ -270,7 +272,7 @@ app.controller('listStudentCtrl', function($scope, $rootScope, $ionicPopup, $sta
 
     $scope.initList = function() {
         if ($rootScope.members == undefined || $rootScope.members.length == 0) {
-
+            $rootScope.teachers = [];
             if ($cordovaNetwork.isOnline()) {
                 if (firebase == undefined) {
                     firebase.initializeApp(config);
@@ -282,6 +284,7 @@ app.controller('listStudentCtrl', function($scope, $rootScope, $ionicPopup, $sta
                     }
                     $rootScope.loadingState = false;
                 });
+                
             } else {
                 try {
                     firebase.initializeApp(config);
@@ -299,7 +302,6 @@ app.controller('listStudentCtrl', function($scope, $rootScope, $ionicPopup, $sta
         }
     }
     $scope.initList();
-
 
     $scope.insertGroupStudent = function(group_id, id, name, rol) {
         try {

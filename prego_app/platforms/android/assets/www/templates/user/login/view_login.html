@@ -1,5 +1,5 @@
-
-<!--Copyright (c) <2016> <Yeison Gomez Rodriguez, Brayan Stiven Tovar Claros>--><ion-view view-title="Bienvenido">
+<!--Copyright (c) <2016> <Yeison Gomez Rodriguez, Brayan Stiven Tovar Claros>-->
+<ion-view view-title="Bienvenido">
     <ion-content class="indigo-500" style="z-index: 1">
         <ion-list>
             <div class="text-center">
@@ -16,8 +16,16 @@
                 <button ng-disabled="!validLogin()" class="margin-5-pc width-90-pc bottom-18-px button background-amber-icon color-white" ng-click="login()">
                     Iniciar sesión
                 </button>
+                <div>
+                    
+                <button ng-click="modalPassword()" class="button button-outline button-stable">
+                    boton sin proposito
+                </button>
+                <button ng-click="modalConfirm()" class="button button-outline button-stable">
+                    alert contraseña
+                </button>
+                </div>
             </div>
-            </ion-list>
+        </ion-list>
     </ion-content>
 </ion-view>
-

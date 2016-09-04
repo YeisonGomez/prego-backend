@@ -12,7 +12,7 @@
                             {{chat.time | date: 'MMMM/dd h:mm a'}}
                         </div>
                         <div class="chat-name">
-                            {{getNameMembers(chat.user_id)}}
+                            {{chat.user_name}}
                         </div>
                     </div>
                     <div class="width-all" ng-if="mostConversation && conversation.length >= 10 && isNetWork()">
@@ -29,7 +29,8 @@
                 </ion-content>
                 <div class="bar bar-footer fix-border-footer footer-slide-down indigo-600">
                     <label class="item item-input chat-border-round indigo-50 border-none width-85-pc chat-input">
-                        <input id="wallInput" ng-init="message=''" type="text" placeholder="Escribe tu mensaje" ng-model="message">
+                        <input id="wallInput" ng-init="message=''" type="text" placeholder="Escribe tu mensaje" 
+                        ng-model="message">
                     </label>
                     <a class="button color-amber-icon button-icon icon ion-paper-airplane pull-right" ng-click="sendMessage(message)"></a>
                 </div>
@@ -63,7 +64,7 @@
                             {{chat.time | date: 'MMMM/dd h:mm a'}}
                         </div>
                         <div class="chat-name">
-                            {{getNameMembers(chat.user_id)}}
+                            {{chat.user_name}}
                         </div>
                     </div>
                     <div class="width-all" ng-if="mostConversationStudent && conversationStudent.length >= 10 && isNetWork()">

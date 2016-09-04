@@ -8,20 +8,27 @@ app.factory('wallService', function($http, $rootScope) {
                 callback("done", message);
             })
         },
- 
+
         getMessages: function(tam, group_id, addMessage, callback) {
-            var fireBD = firebase.database().ref('chats/' + group_id + '/teacher');
-            fireBD.limitToLast(tam + 10).on('child_added', function(data) {
-                addMessage({
-                    key: data.key,
-                    user_id: data.val().id,
-                    message: data.val().message,
-                    rol: data.val().rol,
-                    time: data.val().time
+            try {
+                var fireBD = firebase.database().ref('chats/' + group_id + '/teacher');
+            } catch (err) {
+                firebase.initializeApp(config);
+                var fireBD = firebase.database().ref('chats/' + group_id + '/teacher');
+            } finally {
+                fireBD.limitToLast(tam + 10).on('child_added', function(data) {
+                    addMessage({
+                        key: data.key,
+                        user_name: data.val().name,
+                        message: data.val().message,
+                        rol: data.val().rol,
+                        time: data.val().time
+                    });
+                    callback(fireBD);
                 });
-                callback(fireBD);
-            });
-            $rootScope.loadingState = false;
+                $rootScope.loadingState = false;
+            }
+
         }
 
     }

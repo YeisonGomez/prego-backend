@@ -2,32 +2,11 @@
 app.controller('wallCtrl', function($scope, $ionicSlideBoxDelegate, $state, $rootScope, $cordovaSQLite, wallService, $cordovaNetwork, $ionicScrollDelegate) {
 
     var vari;
-    $scope.message = "";
+    $rootScope.message = "";
     $scope.conversation = [];
     $scope.mostConversation = true;
     $scope.limitMessage = 0;
     $scope.isConnectionDBWall = false;
-
-    $scope.isNetWork = function() {
-        return $cordovaNetwork.isOnline();
-    }
-
-    $rootScope.getNameMembers = function(id) {
-        if (id == $rootScope.user.id) {
-            return "Yo:"
-        } else {
-            for (var i = 0; i < $rootScope.members.length; i++) {
-                if ($rootScope.members[i].key == $state.params.id) {
-                    for (var j = 0; j < $rootScope.members[i].value.length; j++) {
-                        if ($rootScope.members[i].value[j].id == id) {
-                            return $rootScope.members[i].value[j].name + ":";
-                        }
-                    }
-                }
-            }
-            return "";
-        }
-    }
 
     $scope.nextSlide = function() {
         $ionicSlideBoxDelegate.next();
@@ -41,15 +20,17 @@ app.controller('wallCtrl', function($scope, $ionicSlideBoxDelegate, $state, $roo
         }
         return true;
     }
+
     var contMostMessage = 10;
     var setMessage = function(data) {
         if (getRepeat(data)) {
             contMostMessage = 10;
+            var rol = classRol(data);
             $scope.conversation.push({
                 id: data.key,
-                user_id: data.user_id,
                 message: data.message,
-                class: classRol(data),
+                user_name: (rol == 'chat-mine')? "Yo:" : data.user_name,
+                class: rol,
                 time: data.time
             });
             saveMessage(data);
@@ -90,13 +71,13 @@ app.controller('wallCtrl', function($scope, $ionicSlideBoxDelegate, $state, $roo
                     $rootScope.loading(6);
                     repit = true;
                     wallService.sendMessage({
-                        id: $rootScope.user.id,
+                        name: $rootScope.user.name,
                         message: message,
                         rol: $rootScope.user.rol,
                         time: new Date().getTime()
                     }, $state.params.id, function(res, json) {
                         if (res == "done") {
-                            $scope.message = "";
+                            $rootScope.message = "";
                             document.getElementById("wallInput").value = "";
                         } else {
                             $rootScope.messageNotification("No tienes conexion a internet");
@@ -117,7 +98,7 @@ app.controller('wallCtrl', function($scope, $ionicSlideBoxDelegate, $state, $roo
             $cordovaSQLite.execute(db, query, [$state.params.id]).then(function(result) {
                 if (result.rows.length >= 10) {
                     var query = "UPDATE chateacher SET user = ?, message = ?, userol = ?, time = ? WHERE chat_id = ?";
-                    $cordovaSQLite.execute(db, query, [data.user_id, data.message, data.rol, data.time, data.key]).then(function(result2) {
+                    $cordovaSQLite.execute(db, query, [data.user_name, data.message, data.rol, data.time, data.key]).then(function(result2) {
                         //console.log("UPDATE -> " + data.message);
                     }, function(error) {
                         console.log(error);
@@ -134,7 +115,7 @@ app.controller('wallCtrl', function($scope, $ionicSlideBoxDelegate, $state, $roo
                     }
                     if (!exist) {
                         var query = "INSERT INTO chateacher (group_id, chat_id, user, message, userol, time) VALUES (?, ?, ?, ?, ?, ?)";
-                        $cordovaSQLite.execute(db, query, [$state.params.id, data.key, data.user_id, data.message, data.rol, data.time]).then(function(result3) {
+                        $cordovaSQLite.execute(db, query, [$state.params.id, data.key, data.user_name, data.message, data.rol, data.time]).then(function(result3) {
                             //console.log("INSERT ID -> " + data.message);
                         }, function(error, a) {
                             console.log(error);
@@ -157,11 +138,12 @@ app.controller('wallCtrl', function($scope, $ionicSlideBoxDelegate, $state, $roo
         $cordovaSQLite.execute(db, query, [$state.params.id]).then(function(result) {
             if (result.rows.length > 0) {
                 for (var i = 0; i < result.rows.length; i++) {
+                    var rol = classRol({rol: result.rows.item(i).userol, user_name: result.rows.item(i).user});
                     $scope.conversation.push({
                         id: result.rows.item(i).chat_id,
-                        user_id: result.rows.item(i).user,
+                        user_name: (rol == 'chat-mine')? "Yo:": result.rows.item(i).user,
                         message: result.rows.item(i).message,
-                        class: classRol(result.rows.item(i).userol),
+                        class: rol,
                         time: result.rows.item(i).time
                     });
                 }
@@ -175,9 +157,9 @@ app.controller('wallCtrl', function($scope, $ionicSlideBoxDelegate, $state, $roo
     }
 
     var classRol = function(send) {
-        if ($rootScope.user.rol == "Docente" || send.rol == "Docente") {
+        if (send.rol == "Docente") {
             return "chat-professor";
-        } else if ($rootScope.user.id == send.user_id) {
+        } else if ($rootScope.user.name == send.user_name) {
             return "chat-mine";
         } else {
             return "chat-other";
@@ -226,6 +208,8 @@ app.controller('wallCtrl', function($scope, $ionicSlideBoxDelegate, $state, $roo
             return "(￣ー￣)";
         } else if (message == "Tengo muchisimo dinero") {
             return "Tendrá todo el dinero del mundo pero hay algo que nunca podrá comprar... un dinosaurio";
+        } else if (message == "Suerte gonorreas") {
+            return "Suerte gonorreas By: El Brayan";
         } else {
             return message;
         }

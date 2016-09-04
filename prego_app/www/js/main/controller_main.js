@@ -1,5 +1,5 @@
 /*Copyright (c) <2016> <Yeison Gomez Rodriguez, Brayan Stiven Tovar Claros>*/
-    app.controller('mainCtrl', function($scope, $rootScope, $auth, $location, $state, $ionicSideMenuDelegate, $cordovaSQLite, $ionicPopup, $ionicModal) {
+    app.controller('mainCtrl', function($scope, $rootScope, $cordovaNetwork, $auth, $location, $state, $ionicSideMenuDelegate, $cordovaSQLite, $ionicPopup, $ionicModal) {
 
         if ($rootScope.user == undefined) {
             $rootScope.user = {
@@ -11,6 +11,13 @@
             };
         }
 
+        $scope.isNetWork = function() {
+            return $cordovaNetwork.isOnline();
+        }
+
+        $scope.idSubjectNow = function(){
+            return $state.params.id;
+        }
         
         $scope.inputSms = false;
         $scope.isWall = function() {
@@ -27,16 +34,21 @@
         }
 
         $scope.viewlogOut = false;
-        // if (!$ionicSideMenuDelegate.isOpenLeft()) {
-        //    $scope.viewlogOut = false;
-        //} 
-        //console.log($ionicSideMenuDelegate.$getByHandle('left'));
 
         $scope.activelogOut = function(viewlogOut) {
             if (!viewlogOut) {
                 $scope.viewlogOut = true;
             } else {
                 $scope.viewlogOut = false;
+            }
+        }
+
+        $scope.viewUpdate = false;
+        $scope.activeUpdate = function(viewUpdate) {
+            if (!viewUpdate) {
+                $scope.viewUpdate = true;
+            } else {
+                $scope.viewUpdate = false;
             }
         }
 
@@ -66,9 +78,7 @@
         // Cleanup the modal when we're done with it!
         $scope.$on('$destroy', function() {
             $scope.modalProm.remove();
-        });
-
-        
+        }); 
 
         $scope.activities = [
             { name: "Trabajo escrito muy largo", grade: 3.5 },
