@@ -6,7 +6,7 @@ exports.getSubjects = function(userId, callback) {
         if (snapshot.val() != null) {
             var dato = [];
             snapshot.forEach(function(data) {
-                dato.push({id: data.key, name: data.val().name});
+                dato.push({ id: data.key, name: data.val().name });
             });
             callback(dato);
         } else {
@@ -15,23 +15,35 @@ exports.getSubjects = function(userId, callback) {
     })
 }
 
-exports.saveStudent = function(student, token, user) {
+exports.getSessionChaira = function(user, callback) {
+    db.ref("user").orderByChild("user").equalTo(user.toUpperCase()).once("value", function(snapshot) {
+        if (snapshot.val() != null) {
+            snapshot.forEach(function(data) {
+                callback(data.val().sessionChaira, data.val(), data.key);
+            });
+        } else {
+            callback();
+        }
+    })
+}
+
+exports.save = function(student, token, user, rol) {
     var usersRef = studentFB.child(student.codeStudent);
     usersRef.set({
-        user: user,
+        user: user.toUpperCase(),
         name: student.nameStudent,
-        program: student.program,
+        program: (rol == "Docente")? "Docente" : student.program,
         session: token.token,
         group: [],
-        rol: "Estudiante"
+        rol: rol
     });
     return token;
 }
 
-exports.saveDocent = function(teacher, token, user, groups){
+exports.saveDocent = function(teacher, token, user, groups, sessionChaira) {
     var usersRef = studentFB.child(teacher.id);
     usersRef.set({
-        user: user,
+        user: user.toUpperCase(),
         name: teacher.name,
         program: "",
         session: token.token,
@@ -40,4 +52,3 @@ exports.saveDocent = function(teacher, token, user, groups){
     });
     return token;
 }
-

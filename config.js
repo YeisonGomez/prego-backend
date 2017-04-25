@@ -9,7 +9,8 @@ module.exports = {
     firebase: firebase,
 
     server: {
-        ip: process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
-        port: process.env.OPENSHIFT_NODEJS_PORT || 8099
+        ip: '104.236.225.92',
+        //ip: 'localhost',
+        port: 8099
     }
 }

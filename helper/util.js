@@ -5,7 +5,6 @@ exports.generateToken = function(token){
         id: token.id,
         name: token.name,
         user: token.user,
-        rol: token.rol,
         program: token.program,
         date: token.date
       }

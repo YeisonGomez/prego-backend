@@ -9,9 +9,5 @@ var route = {}
 //USUARIO
 router.post('/user/login', route.user.login);
 router.post('/user/subjects', auth.authenticateToken, route.user.getSubjects);
-router.get('/user/getAll', route.user.getAll);
-
-//PROFILE
-//router.get('/profile/information', auth.ensureAuthenticated, route.profile.getInformation);
 
 module.exports = router;
