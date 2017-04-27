@@ -33,7 +33,8 @@ var controlGroup = function(user, schedule, codeGroup) {
                 });
                 //Agregar ids grupos Estudiante
                 db.ref("user/" + user.codeStudent + "/group").child(codeGroup).update({
-                    name: schedule.name
+                    name: schedule.name,
+                    resource: schedule.resource
                 });
 
                 if (idTeacher.id != "SD" && rol != "Docente") {
@@ -65,7 +66,8 @@ var controlGroup = function(user, schedule, codeGroup) {
                 });
                 //Agregar grupos Estudiante
                 db.ref("user/" + user.codeStudent + "/group").child(codeGroup).update({
-                    name: schedule.name.toUpperCase()
+                    name: schedule.name.toUpperCase(),
+                    resource: schedule.resource
                 });
 
                 if (idTeacher.id != "SD" && rol != "Docente") {

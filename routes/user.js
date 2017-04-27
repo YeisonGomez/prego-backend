@@ -19,8 +19,6 @@ exports.login = function(req, res) {
                     var user = JSON.parse(JSON.parse(response.body.replace('{"d":null}', "")).description);
                     console.log(user[0].CORREO);
                     getSchedulesRol(user, 0, [], { header: headers, token: req.body.tok }, function(schedule) {
-                        var schedule2 = parsearSchedule(schedule, user, program); //Horario
-
                         var student = false,
                             docent = false,
                             job = false;
@@ -35,6 +33,7 @@ exports.login = function(req, res) {
                         }
 
                         if (student || docent) {
+                            var schedule2 = parsearSchedule(schedule, user, program); //Horario
                             var usuario = user[0].CORREO.split("@")[0];
                             var token = util.generateToken({
                                 id: usuario.replace(".", "-"),
@@ -148,9 +147,8 @@ var parsearSchedule = function(schedule, user, program) {
                         resource: schedule2[i].NOMENCLATURA
                     }]
                 };
-
                 for (var j = i + 1; j < schedule2.length; j++) {
-                    if (schedule2[j].CODIGOGRUPO == schedule2[i].CODIGOGRUPO) {
+                    if (schedule2[j] != undefined && schedule2[j].CODIGOGRUPO == schedule2[i].CODIGOGRUPO) {
                         subject.resource.push({
                             day: schedule2[j].DIA,
                             hour: schedule2[j].TIEMPO,

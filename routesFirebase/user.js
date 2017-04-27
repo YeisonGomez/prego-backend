@@ -6,7 +6,7 @@ exports.getSubjects = function(userId, callback) {
         if (snapshot.val() != null) {
             var dato = [];
             snapshot.forEach(function(data) {
-                dato.push({ id: data.key, name: data.val().name });
+                dato.push({ id: data.key, name: data.val().name, resource: data.val().resource });
             });
             callback(dato);
         } else {
